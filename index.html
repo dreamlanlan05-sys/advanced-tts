@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#090d16">
+<title>advanced-tts · AI 配音工作台</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body {
+    background:#090d16; color:#e2e8f0; min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background-image:
+      radial-gradient(600px 400px at 0% 0%, rgba(34,211,238,.08), transparent),
+      radial-gradient(600px 400px at 100% 100%, rgba(167,139,250,.08), transparent);
+    padding: env(safe-area-inset-top) 16px calc(24px + env(safe-area-inset-bottom));
+  }
+  .wrap { max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:14px; padding-top:16px; }
+  .card {
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.09);
+    border-radius:16px; padding:16px; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  }
+  header { display:flex; align-items:center; justify-content:space-between; }
+  .logo { display:flex; align-items:center; gap:10px; }
+  .logo-cube {
+    width:38px; height:38px; border-radius:11px; display:grid; place-items:center; font-size:18px;
+    background:linear-gradient(135deg,#22d3ee,#8b5cf6); box-shadow:0 0 18px rgba(34,211,238,.35);
+  }
+  h1 { font-size:16px; letter-spacing:.25em; background:linear-gradient(90deg,#67e8f9,#c4b5fd); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { font-size:10px; color:#64748b; letter-spacing:.15em; font-family:ui-monospace,monospace; }
+  .dot { width:8px; height:8px; border-radius:50%; background:#34d399; box-shadow:0 0 8px #34d399; animation:pulse 1.6s infinite; display:inline-block; margin-right:6px; }
+  @keyframes pulse { 50% { opacity:.4; } }
+  .status { font-size:10px; font-family:ui-monospace,monospace; color:#6ee7b7; letter-spacing:.1em; }
+  label { display:block; font-size:11px; letter-spacing:.2em; color:#7dd3fc; font-family:ui-monospace,monospace; margin-bottom:8px; }
+  textarea {
+    width:100%; height:150px; resize:vertical; border-radius:12px; padding:12px;
+    background:rgba(0,0,0,.35); border:1px solid rgba(34,211,238,.2); color:#e2e8f0;
+    font-size:15px; line-height:1.7; outline:none; font-family:inherit;
+  }
+  textarea:focus { border-color:rgba(34,211,238,.6); box-shadow:0 0 18px rgba(34,211,238,.12); }
+  .meta { display:flex; justify-content:space-between; margin-top:6px; font-size:10px; color:#64748b; font-family:ui-monospace,monospace; }
+  .clear-btn { color:#fca5a5; background:none; border:none; cursor:pointer; font-size:10px; font-family:ui-monospace,monospace; letter-spacing:.1em; }
+  .voices { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  @media(min-width:560px){ .voices { grid-template-columns:repeat(6,1fr); } }
+  .voice {
+    border:1px solid rgba(255,255,255,.1); background:rgba(0,0,0,.3); border-radius:12px;
+    padding:10px 4px; text-align:center; cursor:pointer; transition:.2s; color:#94a3b8;
+  }
+  .voice .vn { font-size:12px; font-weight:600; color:#e2e8f0; }
+  .voice .vd { font-size:9px; margin-top:3px; font-family:ui-monospace,monospace; }
+  .voice.on { border-color:#22d3ee; background:rgba(34,211,238,.1); box-shadow:0 0 14px rgba(34,211,238,.25); color:#67e8f9; }
+  .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .row > * { flex:1; }
+  select, input[type=password] {
+    width:100%; background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.12); color:#cbd5e1;
+    border-radius:10px; padding:10px; font-size:13px; font-family:ui-monospace,monospace; outline:none;
+  }
+  input[type=range]{ width:100%; appearance:none; height:5px; border-radius:99px; background:rgba(255,255,255,.1); outline:none; }
+  input[type=range]::-webkit-slider-thumb{
+    appearance:none; width:18px; height:18px; border-radius:50%; background:#fff;
+    box-shadow:0 0 10px rgba(34,211,238,.9); cursor:pointer;
+  }
+  .val { font-family:ui-monospace,monospace; font-size:12px; color:#67e8f9; min-width:44px; text-align:right; flex:0; }
+  .gen {
+    width:100%; padding:15px; border-radius:14px; border:1px solid rgba(34,211,238,.4); cursor:pointer;
+    background:linear-gradient(90deg,rgba(34,211,238,.18),rgba(139,92,246,.18));
+    color:#a5f3fc; font-size:14px; letter-spacing:.25em; font-family:ui-monospace,monospace;
+    transition:.2s; position:relative; overflow:hidden;
+  }
+  .gen:not(:disabled):hover { box-shadow:0 0 24px rgba(34,211,238,.3); }
+  .gen:disabled { opacity:.45; cursor:not-allowed; }
+  .bar { position:absolute; inset:0; width:0%; background:rgba(34,211,238,.18); transition:width .3s; }
+  .gen span { position:relative; }
+  .player { display:none; flex-direction:column; gap:10px; }
+  .player.show { display:flex; }
+  audio { width:100%; height:40px; }
+  .dl {
+    display:block; text-align:center; padding:13px; border-radius:12px; text-decoration:none;
+    border:1px solid rgba(52,211,153,.45); background:rgba(52,211,153,.1); color:#6ee7b7;
+    font-size:12px; letter-spacing:.2em; font-family:ui-monospace,monospace;
+  }
+  .dl:active { background:rgba(52,211,153,.25); }
+  .err { color:#fca5a5; font-size:12px; font-family:ui-monospace,monospace; display:none; }
+  .hint { font-size:10px; color:#475569; font-family:ui-monospace,monospace; line-height:1.6; }
+  .presets { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .preset { font-size:10px; font-family:ui-monospace,monospace; letter-spacing:.05em; color:#c4b5fd;
+    border:1px solid rgba(167,139,250,.3); background:rgba(167,139,250,.06); border-radius:8px; padding:6px 10px; cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="card">
+    <div class="logo">
+      <div class="logo-cube">🎙️</div>
+      <div>
+        <h1>advanced-tts</h1>
+        <div class="sub">AI VOICEOVER STUDIO · 社媒配音工作台</div>
+      </div>
+    </div>
+    <div class="status"><span class="dot"></span>READY</div>
+  </header>
+
+  <!-- API KEY(首次输入,本机保存) -->
+  <section class="card" id="keyCard">
+    <label>◈ OPENAI API KEY(仅保存在本设备)</label>
+    <div class="row">
+      <input type="password" id="apiKey" placeholder="sk-...">
+      <button class="gen" style="flex:0 0 90px;padding:10px" onclick="saveKey()"><span>保存</span></button>
+    </div>
+    <p class="hint" style="margin-top:8px">Key 存储于浏览器 localStorage,仅本机可见。请勿把已填入 Key 的页面分享给他人。</p>
+  </section>
+
+  <!-- 文本 -->
+  <section class="card">
+    <label>◈ 配音文稿</label>
+    <textarea id="text" placeholder="在这里粘贴你的社媒文案……支持中英文混合。"></textarea>
+    <div class="meta">
+      <span>字数:<b id="count" style="color:#67e8f9">0</b> / 4096</span>
+      <button class="clear-btn" onclick="clearText()">✕ 清空</button>
+    </div>
+    <div class="presets">
+      <button class="preset" onclick="fillPreset(0)">开场白模板</button>
+      <button class="preset" onclick="fillPreset(1)">科技快讯模板</button>
+      <button class="preset" onclick="fillPreset(2)">带货结尾模板</button>
+    </div>
+  </section>
+
+  <!-- 音色矩阵 -->
+  <section class="card">
+    <label>◈ 音色矩阵 VOICE MATRIX</label>
+    <div class="voices" id="voices"></div>
+  </section>
+
+  <!-- 参数 -->
+  <section class="card">
+    <label>◈ 参数</label>
+    <div class="row" style="margin-bottom:12px">
+      <span class="hint" style="flex:0 0 56px">语速</span>
+      <input type="range" id="speed" min="0.5" max="1.5" step="0.05" value="1" oninput="spdVal.textContent=this.value+'x'">
+      <span class="val" id="spdVal">1x</span>
+    </div>
+    <div class="row">
+      <span class="hint" style="flex:0 0 56px">音质</span>
+      <select id="model">
+        <option value="tts-1">tts-1 · 标准(快/省)</option>
+        <option value="tts-1-hd" selected>tts-1-hd · 高清(推荐配音)</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- 生成 -->
+  <button class="gen" id="genBtn" onclick="generate()">
+    <div class="bar" id="bar"></div>
+    <span id="genLabel">⚡ 生成配音</span>
+  </button>
+  <p class="err" id="err"></p>
+
+  <!-- 播放器 -->
+  <section class="card player" id="player">
+    <label>◈ 成品音频</label>
+    <audio id="audio" controls></audio>
+    <a class="dl" id="dl" download>⬇ 下载 MP3(可直接导入剪映 / CapCut)</a>
+  </section>
+
+  <p class="hint" style="text-align:center">advanced-tts · Powered by OpenAI TTS · 手机端可"添加到主屏幕"作为独立 App 使用</p>
+</div>
+
+<script>
+const VOICES = [
+  { id:'alloy',   name:'Alloy',   desc:'中性 · 通用' },
+  { id:'echo',    name:'Echo',    desc:'男声 · 沉稳' },
+  { id:'fable',   name:'Fable',   desc:'英伦 · 叙事' },
+  { id:'onyx',    name:'Onyx',    desc:'男声 · 磁性' },
+  { id:'nova',    name:'Nova',    desc:'女声 · 明快' },
+  { id:'shimmer', name:'Shimmer', desc:'女声 · 柔和' },
+];
+const PRESETS = [
+  '大家好,欢迎回到我的频道!今天要跟你们聊一个可能改变未来十年的话题——',
+  '今日科技快讯:人工智能与区块链的融合正在加速,一个可信、可验证的数字新世界正在成形。三十秒,带你看懂这件大事。',
+  '如果你也觉得有用,记得点赞加关注,我们下期不见不散!',
+];
+let voice = 'nova';
+let lastBlobUrl = null;
+
+// ── 初始化 ──
+const vGrid = document.getElementById('voices');
+VOICES.forEach(v => {
+  const b = document.createElement('div');
+  b.className = 'voice' + (v.id === voice ? ' on' : '');
+  b.innerHTML = `<div class="vn">${v.name}</div><div class="vd">${v.desc}</div>`;
+  b.onclick = () => { voice = v.id; document.querySelectorAll('.voice').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
+  vGrid.appendChild(b);
+});
+
+const ta = document.getElementById('text');
+ta.addEventListener('input', () => {
+  if (ta.value.length > 4096) ta.value = ta.value.slice(0, 4096);
+  document.getElementById('count').textContent = ta.value.length;
+});
+function clearText(){ ta.value=''; ta.dispatchEvent(new Event('input')); }
+function fillPreset(i){ ta.value = PRESETS[i]; ta.dispatchEvent(new Event('input')); }
+
+// ── API Key 管理 ──
+const keyInput = document.getElementById('apiKey');
+const saved = localStorage.getItem('advanced-tts_key');
+if (saved) { keyInput.value = saved; document.getElementById('keyCard').style.opacity = .6; }
+function saveKey(){
+  const k = keyInput.value.trim();
+  if (!k.startsWith('sk-')) return showErr('Key 格式不对,应以 sk- 开头');
+  localStorage.setItem('advanced-tts_key', k);
+  document.getElementById('keyCard').style.opacity = .6;
+  showErr('');
+}
+
+function showErr(msg){
+  const e = document.getElementById('err');
+  e.textContent = msg; e.style.display = msg ? 'block' : 'none';
+}
+
+// ── 生成 ──
+async function generate(){
+  const key = localStorage.getItem('advanced-tts_key');
+  const text = ta.value.trim();
+  if (!key) return showErr('请先保存你的 OpenAI API Key');
+  if (!text) return showErr('请先输入配音文稿');
+  showErr('');
+
+  const btn = document.getElementById('genBtn'),
+        label = document.getElementById('genLabel'),
+        bar = document.getElementById('bar');
+  btn.disabled = true;
+  label.textContent = '⟳ 合成中…';
+  let p = 0;
+  const timer = setInterval(()=>{ p = Math.min(90, p + Math.random()*12); bar.style.width = p + '%'; }, 250);
+
+  try {
+    const res = await fetch('https://api.openai.com/v1/audio/speech', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: document.getElementById('model').value,
+        input: text,
+        voice: voice,
+        speed: parseFloat(document.getElementById('speed').value),
+        response_format: 'mp3',
+      }),
+    });
+    if (!res.ok) {
+      const errBody = await res.json().catch(()=>({}));
+      throw new Error(errBody?.error?.message || ('HTTP ' + res.status));
+    }
+    const blob = await res.blob();
+    if (lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
+    lastBlobUrl = URL.createObjectURL(blob);
+
+    document.getElementById('audio').src = lastBlobUrl;
+    const dl = document.getElementById('dl');
+    dl.href = lastBlobUrl;
+    dl.download = 'advanced-tts_' + voice + '_' + Date.now() + '.mp3';
+    document.getElementById('player').classList.add('show');
+    bar.style.width = '100%';
+    document.getElementById('audio').play().catch(()=>{}); // iOS 可能需手动点播放
+  } catch (e) {
+    showErr('✕ 合成失败:' + e.message);
+  } finally {
+    clearInterval(timer);
+    setTimeout(()=>{ bar.style.width='0%'; }, 600);
+    btn.disabled = false;
+    label.textContent = '⚡ 生成配音';
+  }
+}
+</script>
+</body>
+</html>
