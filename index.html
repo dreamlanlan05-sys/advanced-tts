@@ -112,6 +112,33 @@
   .err { color:#fca5a5; font-size:12px; line-height:1.6; display:none; word-break:break-word; }
   .hint { font-size:10px; color:#64748b; line-height:1.7; }
   .hint a { color:#7dd3fc; }
+
+  /* ── 第 7 张卡片:专属克隆音色 ── */
+  .voice.clone { grid-column:1 / -1; min-height:0; border-style:dashed; border-color:rgba(167,139,250,.45); }
+  .voice.clone.on { border-style:solid; border-color:#a78bfa; background:rgba(167,139,250,.1); box-shadow:0 0 16px rgba(167,139,250,.25); }
+  .voice.clone.on .vg { color:#c4b5fd; }
+  .voice.clone.on .vt span { border-color:rgba(167,139,250,.45); color:#ddd6fe; }
+  .clone-panel { display:none; margin-top:12px; border:1px solid rgba(167,139,250,.3); border-radius:14px; padding:14px; background:rgba(167,139,250,.04); }
+  .clone-panel.show { display:flex; flex-direction:column; gap:14px; }
+  .clone-panel details summary { color:#c4b5fd; }
+  .step-t { font-size:12px; color:#ddd6fe; font-weight:600; line-height:1.5; }
+  .list { display:flex; flex-direction:column; gap:8px; }
+  .saved { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid rgba(255,255,255,.1); border-radius:10px; cursor:pointer; font-size:13px; }
+  .saved.on { border-color:#a78bfa; background:rgba(167,139,250,.08); }
+  .saved .nm { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#f1f5f9; }
+  .saved .eg { font-size:10px; color:#94a3b8; white-space:nowrap; }
+  .saved .rm { color:#fca5a5; }
+  .script { font-size:13px; line-height:1.8; color:#e2e8f0; background:rgba(0,0,0,.3); border-radius:10px; padding:10px 12px; }
+  .drop { border:1px dashed rgba(255,255,255,.2); border-radius:12px; padding:14px; text-align:center; font-size:12px; color:#94a3b8; display:flex; flex-direction:column; gap:10px; align-items:center; }
+  .drop.over { border-color:#a78bfa; background:rgba(167,139,250,.08); }
+  .drop .acts { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .chip.big { font-size:12px; padding:9px 14px; }
+  .chip.rec { color:#fca5a5; border-color:rgba(252,165,165,.4); background:rgba(252,165,165,.06); }
+  .chip.rec.on { background:rgba(239,68,68,.25); color:#fff; animation:pulse 1.2s infinite; }
+  .capinfo:empty { display:none; }
+  #cMsg:empty { display:none; }
+  #cMsg { font-size:12px; }
+  #cMsg.bad { color:#fca5a5; } #cMsg.good { color:#6ee7b7; }
 </style>
 </head>
 <body>
@@ -160,6 +187,93 @@
   <section class="card">
     <label class="sec mono">◈ 音色矩阵 VOICE MATRIX</label>
     <div class="voices" id="voices"></div>
+
+    <!-- 专属克隆音色面板(选中第 7 张卡片时展开) -->
+    <div class="clone-panel" id="clonePanel">
+      <div class="list" id="savedWrap">
+        <div class="step-t">我的专属音色</div>
+        <div class="list" id="savedList"></div>
+      </div>
+      <details id="cloneNew">
+        <summary class="mono">＋ 创建新的专属音色</summary>
+        <div class="stack">
+          <div class="row">
+            <span class="rl">克隆引擎</span>
+            <div class="grow">
+              <select id="cEngine">
+                <option value="gemini">Gemini 复刻(免新 Key)</option>
+                <option value="inworld">Inworld · inworld-tts-2</option>
+                <option value="elevenlabs">ElevenLabs</option>
+                <option value="fish">Fish Audio</option>
+              </select>
+            </div>
+          </div>
+          <p class="hint" id="cNote"></p>
+          <div class="row" id="cKeyRow">
+            <span class="rl">API Key</span>
+            <div class="grow"><input type="password" id="cKey" autocomplete="off"></div>
+            <button class="btn small" id="cKeySave" type="button"><span>保存</span></button>
+          </div>
+          <div class="row" id="cModelRow">
+            <span class="rl">合成模型</span>
+            <div class="grow"><input type="text" id="cModel" autocomplete="off"></div>
+          </div>
+          <div class="row" id="cConnRow">
+            <span class="rl">连接方式</span>
+            <div class="grow">
+              <select id="cConn">
+                <option value="auto">自动(先直连,被拦截就走代理)</option>
+                <option value="direct">仅浏览器直连</option>
+                <option value="proxy">仅走 /api/voice-clone 代理</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="step-t">① 参考音频 · 10–30 秒清晰的讲话干声,不要背景音乐</div>
+          <div class="script"><span class="hint">现场录音时可以照着念:</span><br>大家好,这是我为配音录制的一段声音样本。我会用平时说话的语速,自然、清楚地读完这段话。今天天气不错,适合出门走一走,也适合坐下来,安静地读一本书。数字一二三四五,六七八九十。谢谢收听,我们下次再见。</div>
+          <div class="drop" id="srcDrop">
+            <div>把音频拖到这里(mp3 / wav / m4a),或者</div>
+            <div class="acts">
+              <button class="chip big mono" id="srcPick" type="button">选择文件</button>
+              <button class="chip big rec mono" id="srcRec" type="button">● 现场录音</button>
+            </div>
+            <input type="file" id="srcFile" accept="audio/*,.mp3,.wav,.m4a" hidden>
+          </div>
+          <p class="hint capinfo" id="srcInfo"></p>
+          <audio id="srcAudio" controls style="display:none"></audio>
+
+          <div class="stack" id="consentBox">
+            <div class="step-t">② 授权声明 · 用同一支麦克风,原样念出下面这句话(Google 用它确认是本人)</div>
+            <div class="row">
+              <span class="rl">声明语言</span>
+              <div class="grow">
+                <select id="cLocale">
+                  <option value="zh-CN">中文(简体)</option>
+                  <option value="ja-JP">日本語</option>
+                  <option value="en-US">English</option>
+                </select>
+              </div>
+            </div>
+            <div class="script" id="conText"></div>
+            <div class="drop" id="conDrop">
+              <div class="acts">
+                <button class="chip big rec mono" id="conRec" type="button">● 录这句话</button>
+                <button class="chip big mono" id="conPick" type="button">选择文件</button>
+              </div>
+              <input type="file" id="conFile" accept="audio/*,.mp3,.wav,.m4a" hidden>
+            </div>
+            <p class="hint capinfo" id="conInfo"></p>
+            <audio id="conAudio" controls style="display:none"></audio>
+          </div>
+
+          <div class="step-t" id="nameStep">③ 命名并创建</div>
+          <input type="text" id="cName" maxlength="30" placeholder="音色名称,例如:我的旁白声" autocomplete="off" style="font-family:inherit">
+          <button class="btn ghost" id="cCreate" type="button"><span>✦ 创建专属音色</span></button>
+          <p id="cMsg"></p>
+        </div>
+      </details>
+      <p class="hint" style="text-align:center">请仅上传或录制您本人或已获得明确授权的声音素材</p>
+    </div>
     <p class="tip" id="sceneTip"></p>
     <button class="btn ghost" id="previewBtn" style="margin-top:12px" onclick="preview()"><span>▶ 试听当前音色(一句样音)</span></button>
   </section>
@@ -340,7 +454,7 @@ function addBreaths(s) {
 
 const SENT_RE = /[^。！？!?…]+[。！？!?…]*[”’」』）)]*/g;
 
-function buildChunks(raw, scene, smart) {
+function buildChunks(raw, scene, smart, limit) {
   const paras = normalize(raw).split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
   const chunks = [];
   let cur = '';
@@ -354,7 +468,7 @@ function buildChunks(raw, scene, smart) {
     if (smart) body = addBreaths(body);
     const sents = body.match(SENT_RE) || [body];
     sents.forEach(s => {
-      if (cur && cur.length + s.length > CHUNK_LIMIT) push();
+      if (cur && cur.length + s.length > (limit || CHUNK_LIMIT)) push();
       cur += s;
     });
     if (i < paras.length - 1) cur += smart ? ' ' + scene.para + ' ' : ' ';
@@ -390,30 +504,87 @@ function stripWavHeader(bytes) {
   return bytes.subarray(44);
 }
 
-function concatPcm(parts, gapMs) {
-  const gap = new Uint8Array(Math.round(SAMPLE_RATE * gapMs / 1000) * 2);
-  let total = 0;
-  parts.forEach((p, i) => { total += p.length + (i < parts.length - 1 ? gap.length : 0); });
-  const out = new Uint8Array(total);
+// gaps:数字 = 每段之间统一的空白;数组 = 第 i 段后面的空白(毫秒)
+function concatPcm(parts, gaps) {
+  const gapOf = i => new Uint8Array(Math.round(SAMPLE_RATE * (Array.isArray(gaps) ? gaps[i] : gaps) / 1000) * 2);
+  const seq = [];
+  parts.forEach((p, i) => { seq.push(p); if (i < parts.length - 1) seq.push(gapOf(i)); });
+  const out = new Uint8Array(seq.reduce((n, a) => n + a.length, 0));
   let off = 0;
-  parts.forEach((p, i) => {
-    out.set(p, off); off += p.length;
-    if (i < parts.length - 1) { out.set(gap, off); off += gap.length; }
-  });
+  seq.forEach(a => { out.set(a, off); off += a.length; });
   return out;
 }
 
-function pcmToWav(pcm) {
-  const buf = new ArrayBuffer(44 + pcm.length);
-  const v = new DataView(buf);
+function wavBytes(pcm) {
+  const out = new Uint8Array(44 + pcm.length);
+  const v = new DataView(out.buffer);
   const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
   w(0, 'RIFF'); v.setUint32(4, 36 + pcm.length, true); w(8, 'WAVE');
   w(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
   v.setUint32(24, SAMPLE_RATE, true); v.setUint32(28, SAMPLE_RATE * 2, true);
   v.setUint16(32, 2, true); v.setUint16(34, 16, true);
   w(36, 'data'); v.setUint32(40, pcm.length, true);
-  new Uint8Array(buf, 44).set(pcm);
-  return new Blob([buf], { type: 'audio/wav' });
+  out.set(pcm, 44);
+  return out;
+}
+function pcmToWav(pcm) { return new Blob([wavBytes(pcm)], { type: 'audio/wav' }); }
+
+function bytesToB64(bytes) {
+  let s = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+
+// 第三方引擎返回的音频(WAV 或裸 PCM)→ 统一成 24kHz 单声道 16-bit PCM
+function pcmFromAudio(bytes, rawRate) {
+  let rate = rawRate || SAMPLE_RATE, ch = 1;
+  if (bytes.length > 44 && String.fromCharCode(bytes[0], bytes[1], bytes[2], bytes[3]) === 'RIFF') {
+    const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    for (let i = 12; i + 8 <= bytes.length; ) {
+      const id = String.fromCharCode(bytes[i], bytes[i+1], bytes[i+2], bytes[i+3]);
+      const size = v.getUint32(i + 4, true);
+      if (id === 'fmt ') { ch = v.getUint16(i + 10, true) || 1; rate = v.getUint32(i + 12, true) || rate; }
+      if (id === 'data') break;
+      i += 8 + size + (size % 2);
+    }
+    bytes = stripWavHeader(bytes);
+  }
+  const frames = Math.floor(bytes.length / (2 * ch));
+  if (rate === SAMPLE_RATE && ch === 1) return bytes.subarray(0, frames * 2);
+  const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const at = f => { let s = 0; for (let c = 0; c < ch; c++) s += v.getInt16((f * ch + c) * 2, true); return s / ch; };
+  const n = Math.floor(frames * SAMPLE_RATE / rate);
+  const out = new Uint8Array(n * 2), ov = new DataView(out.buffer);
+  for (let i = 0; i < n; i++) {
+    const x = i * rate / SAMPLE_RATE, a = Math.floor(x), b = Math.min(a + 1, frames - 1);
+    ov.setInt16(i * 2, Math.round(at(a) + (at(b) - at(a)) * (x - a)), true);
+  }
+  return out;
+}
+
+// 用户上传/录制的任意音频 → 24kHz 单声道 16-bit PCM(各家克隆接口都吃这个规格)
+async function toPcm24k(blob, maxSecs) {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  const ac = new AC();
+  let buf;
+  try { buf = await ac.decodeAudioData(await blob.arrayBuffer()); }
+  catch (e) { throw new Error('无法解码这段音频,请换成 mp3 / wav / m4a。'); }
+  finally { if (ac.close) ac.close(); }
+  const clipped = buf.duration > maxSecs + 0.05;
+  const secs = Math.min(buf.duration, maxSecs);
+  const frames = Math.max(1, Math.floor(secs * SAMPLE_RATE));
+  const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  const off = new OC(1, frames, SAMPLE_RATE);
+  const node = off.createBufferSource();
+  node.buffer = buf; node.connect(off.destination); node.start(0);
+  const f32 = (await off.startRendering()).getChannelData(0);
+  let peak = 0;
+  for (let i = 0; i < f32.length; i++) { const a = Math.abs(f32[i]); if (a > peak) peak = a; }
+  if (peak < 0.005) throw new Error('这段音频几乎没有声音,请检查麦克风后重录。');
+  const gain = 0.9 / peak;                    // 把音量拉到统一水平
+  const pcm = new Uint8Array(f32.length * 2), v = new DataView(pcm.buffer);
+  for (let i = 0; i < f32.length; i++) v.setInt16(i * 2, Math.max(-32768, Math.min(32767, Math.round(f32[i] * gain * 32767))), true);
+  return { pcm, secs, clipped };
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -488,13 +659,37 @@ function renderVoices() {
     b.onclick = () => { sceneId = s.id; renderVoices(); savePrefs(); };
     grid.appendChild(b);
   });
-  const s = scene();
-  el('sceneTip').textContent = s.tip;
-  const sel = el('altVoice');
-  sel.innerHTML = s.alts.map((v, i) => '<option value="' + v + '">' + v + (i === 0 ? ' · 默认' : ' · 备选') + '</option>').join('');
-  const prefs = loadPrefs();
-  const saved = prefs.alt && prefs.alt[s.id];
-  sel.value = s.alts.includes(saved) ? saved : s.voice;
+
+  // 第 7 张:专属克隆音色
+  const c = activeClone();
+  const cb = document.createElement('button');
+  cb.type = 'button';
+  cb.className = 'voice clone' + (sceneId === 'clone' ? ' on' : '');
+  cb.innerHTML =
+    '<div class="vg mono">专属 · MY CUSTOM VOICE</div>' +
+    '<div class="vn">🎙️ 克隆我的声音</div>' +
+    '<div class="vt"><span></span><span></span></div>' +
+    '<div class="vs">录一段或上传一段自己的声音,用它来朗读文稿</div>';
+  const tags = cb.querySelectorAll('.vt span');
+  tags[0].textContent = c ? '当前:' + c.name : '尚未创建';
+  tags[1].textContent = c ? ENGINES[c.engine].name : '10–30 秒样本';
+  cb.onclick = () => { sceneId = 'clone'; renderVoices(); savePrefs(); };
+  grid.appendChild(cb);
+  el('clonePanel').classList.toggle('show', sceneId === 'clone');
+
+  if (sceneId === 'clone') {
+    el('sceneTip').textContent = c
+      ? '已选中「' + c.name + '」。文稿、语速、智能气口和下载都照常使用。'
+      : '先在下面创建一个专属音色,之后就能像其他音色一样使用。';
+  } else {
+    const s = scene();
+    el('sceneTip').textContent = s.tip;
+    const sel = el('altVoice');
+    sel.innerHTML = s.alts.map((v, i) => '<option value="' + v + '">' + v + (i === 0 ? ' · 默认' : ' · 备选') + '</option>').join('');
+    const prefs = loadPrefs();
+    const saved = prefs.alt && prefs.alt[s.id];
+    sel.value = s.alts.includes(saved) ? saved : s.voice;
+  }
   updateSegs();
 }
 
@@ -509,7 +704,7 @@ function savePrefs() {
   p.pace = +el('pace').value; p.expr = +el('expr').value;
   p.smart = el('smart').checked; p.useStyle = el('useStyle').checked;
   p.model = el('model').value; p.custom = el('customVoice').value.trim();
-  p.alt = p.alt || {}; p.alt[sceneId] = el('altVoice').value;
+  p.alt = p.alt || {}; if (sceneId !== 'clone') p.alt[sceneId] = el('altVoice').value;
   store.set(LS.prefs, JSON.stringify(p));
 }
 
@@ -521,7 +716,7 @@ function syncLabels() {
 const ta = el('text');
 function updateSegs() {
   el('count').textContent = ta.value.length;
-  el('segs').textContent = ta.value.trim() ? buildChunks(ta.value, scene(), el('smart').checked).length : 0;
+  el('segs').textContent = ta.value.trim() ? planJobs(ta.value).jobs.length : 0;
 }
 ta.addEventListener('input', () => {
   if (ta.value.length > MAX_CHARS) ta.value = ta.value.slice(0, MAX_CHARS);
@@ -549,29 +744,75 @@ function setBusy(busy, label) {
   if (!busy) setTimeout(() => { el('bar').style.width = '0%'; }, 600);
 }
 
+// 把文稿拆成一串合成任务。预设音色和 Gemini 克隆:停顿标签留在稿子里;
+// 其他克隆引擎不认识标签,所以在标签处切开,由我们自己插入真实的静音。
+function planJobs(raw) {
+  const smart = el('smart').checked;
+  if (sceneId !== 'clone') {
+    const s = scene();
+    return { isClone:false, tag:s.id, title:s.name, voice:currentVoice(),
+             jobs: buildChunks(raw, s, smart).map(t => ({ text:t, gap:300 })) };
+  }
+  const c = activeClone();
+  const jobs = (!c || c.engine === 'gemini')
+    ? buildChunks(raw, CLONE_SCENE, smart).map(t => ({ text:t, gap:300 }))
+    : splitAtPauses(buildChunks(raw, CLONE_SCENE, smart, CLONE_CHUNK));
+  return { isClone:true, clone:c, tag:'myvoice', title: c ? c.name : '专属音色', voice: c ? c.name : '', jobs };
+}
+
+function splitAtPauses(chunks) {
+  const out = [];
+  chunks.forEach(c => {
+    const bits = c.split(/\s*<(short|long) pause>\s*/);
+    for (let i = 0; i < bits.length; i += 2) {
+      const t = bits[i].trim(), kind = bits[i + 1];
+      const gap = kind === 'long' ? 900 : kind === 'short' ? 450 : 250;
+      if (t) out.push({ text:t, gap });
+      else if (kind && out.length) out[out.length - 1].gap = Math.max(out[out.length - 1].gap, gap);
+    }
+  });
+  return out;
+}
+
+function netMsg(e) {
+  if (e instanceof TypeError) {
+    return location.protocol === 'file:'
+      ? '请求被浏览器拦截(跨域)。本地双击打开时没有代理可用,请从 Vercel 的 https 地址打开再试。'
+      : '网络请求失败或被跨域拦截。请确认已把 api/voice-clone.js 一起部署,或在「连接方式」里切换。';
+  }
+  return e.message;
+}
+
 async function run(rawText, isPreview) {
-  const key = store.get(LS.key);
-  if (!key) return showErr('请先保存你的 Gemini API Key。');
   if (!rawText.trim()) return showErr('请先输入配音文稿。');
+  const plan = planJobs(rawText);
+  let synth;
+  if (!plan.isClone) {
+    const key = store.get(LS.key);
+    if (!key) return showErr('请先保存你的 Gemini API Key。');
+    const style = buildStyle(scene()), model = el('model').value;
+    synth = (t, sig) => synthChunk(key, t, plan.voice, style, model, sig);
+  } else {
+    const c = plan.clone;
+    if (!c) return showErr('请先在「克隆我的声音」里创建一个专属音色。');
+    const key = keyFor(c.engine);
+    if (!key) return showErr('缺少 ' + ENGINES[c.engine].name + ' 的 API Key,请先保存。');
+    const o = { pace:+el('pace').value, expr:+el('expr').value, useStyle:el('useStyle').checked };
+    synth = (t, sig) => ADAPTERS[c.engine].synth(key, c, t, o, sig);
+  }
   showErr('');
 
-  const s = scene();
-  const chunks = buildChunks(rawText, s, el('smart').checked);
-  const voice = currentVoice();
-  const style = buildStyle(s);
-  const model = el('model').value;
-
   ctrl = new AbortController();
-  const parts = [];
+  const parts = [], n = plan.jobs.length;
   try {
-    for (let i = 0; i < chunks.length; i++) {
-      setBusy(true, '⟳ 合成中 ' + (i + 1) + '/' + chunks.length + ' · 点击取消');
-      el('bar').style.width = Math.round((i / chunks.length) * 100) + '%';
-      parts.push(await synthChunk(key, chunks[i], voice, style, model, ctrl.signal));
+    for (let i = 0; i < n; i++) {
+      setBusy(true, '⟳ 合成中 ' + (i + 1) + '/' + n + ' · 点击取消');
+      el('bar').style.width = Math.round((i / n) * 100) + '%';
+      parts.push(await synth(plan.jobs[i].text, ctrl.signal));
     }
     el('bar').style.width = '100%';
 
-    const pcm = concatPcm(parts, 300);
+    const pcm = concatPcm(parts, plan.jobs.map(j => j.gap));
     const blob = pcmToWav(pcm);
     if (lastUrl) URL.revokeObjectURL(lastUrl);
     lastUrl = URL.createObjectURL(blob);
@@ -579,15 +820,15 @@ async function run(rawText, isPreview) {
     el('audio').src = lastUrl;
     const dl = el('dl');
     dl.href = lastUrl;
-    dl.download = 'advanced-tts_' + s.id + '_' + Date.now() + '.wav';
-    el('playerTitle').textContent = isPreview ? '◈ 试听样音 · ' + s.name : '◈ 成品音频 · ' + s.name;
+    dl.download = 'advanced-tts_' + plan.tag + '_' + Date.now() + '.wav';
+    el('playerTitle').textContent = (isPreview ? '◈ 试听样音 · ' : '◈ 成品音频 · ') + plan.title;
     const secs = pcm.length / 2 / SAMPLE_RATE;
     el('audioMeta').textContent =
-      '音色 ' + voice + ' · 时长 ' + secs.toFixed(1) + 's · ' + (blob.size / 1048576).toFixed(2) + ' MB · 24kHz 单声道';
+      '音色 ' + plan.voice + ' · 时长 ' + secs.toFixed(1) + 's · ' + (blob.size / 1048576).toFixed(2) + ' MB · 24kHz 单声道';
     el('player').classList.add('show');
     el('audio').play().catch(() => {});   // iOS 可能需要手动点播放
   } catch (e) {
-    if (e.name !== 'AbortError') showErr('✕ 合成失败:' + e.message);
+    if (e.name !== 'AbortError') showErr('✕ 合成失败:' + netMsg(e));
   } finally {
     ctrl = null;
     setBusy(false);
@@ -600,13 +841,367 @@ function generate() {
 }
 function preview() {
   if (ctrl) return;
-  run(scene().sample, true);
+  run(sceneId === 'clone' ? CLONE_SAMPLE : scene().sample, true);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   6. 专属克隆音色(My Custom Voice)
+   每个引擎一个适配器:clone 建音色、synth 合成一段、remove 删除云端音色。
+   Gemini 用现有 Key 直连;其余三家先直连,被跨域拦截时自动改走
+   同域的 /api/voice-clone 代理(见 api/voice-clone.js)。
+   ═══════════════════════════════════════════════════════════════ */
+const GEMINI_VOICES = 'https://generativelanguage.googleapis.com/v1beta/voices';
+const ENGINES = {
+  gemini: { name:'Gemini 声音复刻', needsConsent:true,
+    note:'沿用上方的 Gemini Key,浏览器直连,不需要代理。Google 要求多录一句授权声明,用来确认是本人。' },
+  inworld: { name:'Inworld', host:'https://api.inworld.ai', keyLS:'advanced-tts_key_inworld', model:'inworld-tts-2',
+    keyHint:'Inworld API Key(Basic 格式,需要写权限)',
+    note:'只需要一段参考音频。Key 在 platform.inworld.ai 创建,要勾选写权限。' },
+  elevenlabs: { name:'ElevenLabs', host:'https://api.elevenlabs.io', keyLS:'advanced-tts_key_elevenlabs', model:'eleven_multilingual_v2',
+    keyHint:'ElevenLabs API Key',
+    note:'只需要一段参考音频。即时克隆能不能用,取决于你的 ElevenLabs 套餐。' },
+  fish: { name:'Fish Audio', host:'https://api.fish.audio', keyLS:'advanced-tts_key_fish', model:'s2.1-pro',
+    keyHint:'Fish Audio API Key',
+    note:'只需要一段参考音频。' },
+};
+const CONSENT = {
+  'zh-CN': '我是此声音的拥有者并授权谷歌使用此声音创建语音合成模型',
+  'ja-JP': '私はこの音声の所有者であり、Googleがこの音声を使用して音声合成モデルを作成することを承認します。',
+  'en-US': 'I am the owner of this voice and I consent to Google using this voice to create a synthetic voice model.',
+};
+const CLONE_SCENE = { para:'<short pause>' };
+const CLONE_CHUNK = 220;                      // 第三方引擎每段字数:短一点更稳,也不会超过代理的响应上限
+const CLONE_SAMPLE = '你好,这是我的专属音色。现在你听到的每一句话,都是用我自己的声音合成的。';
+const RATE = [0.88, 0.94, 1, 1.06, 1.12];     // 语速 5 档 → 第三方引擎的数值倍速
+const CAP = { src:{ max:30, min:5 }, con:{ max:15, min:2 } };
+LS.clones = 'advanced-tts_clones';
+
+// ── 本地持久化:{ list:[{id,name,engine,voiceId,model,at}], active, engine, conn }
+let cloneStore = { list:[], active:null, engine:'gemini', conn:'auto' };
+function loadClones() {
+  try {
+    const d = JSON.parse(store.get(LS.clones) || '{}') || {};
+    cloneStore = {
+      list: Array.isArray(d.list) ? d.list.filter(c => c && c.voiceId && ENGINES[c.engine]) : [],
+      active: d.active || null,
+      engine: ENGINES[d.engine] ? d.engine : 'gemini',
+      conn: ['auto', 'direct', 'proxy'].includes(d.conn) ? d.conn : 'auto',
+    };
+  } catch (e) {}
+}
+function saveClones() { store.set(LS.clones, JSON.stringify(cloneStore)); }
+function activeClone() { return cloneStore.list.find(c => c.id === cloneStore.active) || cloneStore.list[0] || null; }
+function keyFor(engine) { return store.get(ENGINES[engine].keyLS || LS.key); }
+
+// ── 传输层:直连优先,跨域失败时改走同域代理 ──
+const connSeen = {};
+async function xfetch(engine, path, init) {
+  const direct = () => fetch(ENGINES[engine].host + path, init);
+  const proxied = () => fetch('/api/voice-clone?engine=' + engine + '&path=' + encodeURIComponent(path), init);
+  const mode = cloneStore.conn;
+  if (mode === 'direct') return direct();
+  if (mode === 'proxy' || connSeen[engine] === 'proxy') return proxied();
+  try { const r = await direct(); connSeen[engine] = 'direct'; return r; }
+  catch (e) {
+    // 预检失败时请求根本没有发出去,所以改走代理不会造成重复创建
+    if (e.name === 'AbortError' || location.protocol === 'file:') throw e;
+    connSeen[engine] = 'proxy';
+    return proxied();
+  }
+}
+async function failMsg(res) {
+  let t = '';
+  try { t = await res.text(); } catch (e) {}
+  try {
+    const j = JSON.parse(t);
+    const m = j.message || (j.error && (j.error.message || j.error)) || (j.detail && (j.detail.message || j.detail));
+    if (m) t = typeof m === 'string' ? m : JSON.stringify(m);
+  } catch (e) {}
+  if (res.status === 404 && /voice-clone/.test(res.url || '')) t = '没有找到代理函数,请确认 api/voice-clone.js 已经部署。';
+  return 'HTTP ' + res.status + (t ? ' · ' + String(t).slice(0, 300) : '');
+}
+async function okOrThrow(res) { if (!res.ok) throw new Error(await failMsg(res)); return res; }
+const sampleFile = bytes => new File([bytes], 'sample.wav', { type:'audio/wav' });
+const inworldAuth = k => ({ Authorization: /^basic\s/i.test(k) ? k : 'Basic ' + k });
+
+const ADAPTERS = {
+  gemini: {
+    async clone(key, name, src, con, model, signal) {
+      const res = await okOrThrow(await fetch(GEMINI_VOICES, {
+        method:'POST', signal, headers:{ 'x-goog-api-key':key, 'Content-Type':'application/json' },
+        body: JSON.stringify({ store:true, voice:{
+          model:'gemini-3.8-flash-tts', type:'replicated', display_name:name,
+          replicated:{ source_audio:{ mime_type:'audio/wav', data:bytesToB64(src) },
+                       consent_audio:{ mime_type:'audio/wav', data:bytesToB64(con) } } } }),
+      }));
+      const b = await res.json();
+      const id = b.id || (b.voice && b.voice.id) || ((JSON.stringify(b).match(/:\s*"(voice_[A-Za-z0-9_-]{6,})"/) || [])[1]);
+      if (!id) throw new Error('接口返回里没有找到 voice ID。');
+      return id;
+    },
+    synth(key, c, text, o, signal) {
+      // 官方建议:自定义音色只给很短的风格词,甚至不给
+      const style = o.useStyle ? [PACE[o.pace].style, EXPR[o.expr].style].filter(Boolean).join(', ') : '';
+      return synthChunk(key, text, c.voiceId, style, el('model').value, signal);
+    },
+    async remove(key, c) {
+      await okOrThrow(await fetch(GEMINI_VOICES + '/' + encodeURIComponent(c.voiceId), { method:'DELETE', headers:{ 'x-goog-api-key':key } }));
+    },
+  },
+
+  inworld: {
+    async clone(key, name, src, con, model, signal) {
+      const res = await okOrThrow(await xfetch('inworld', '/voices/v1/voices:clone', {
+        method:'POST', signal, headers:{ ...inworldAuth(key), 'Content-Type':'application/json' },
+        body: JSON.stringify({ displayName:name, voiceSamples:[{ audioData:bytesToB64(src) }] }),
+      }));
+      const b = await res.json();
+      const id = b.voice && b.voice.voiceId;
+      if (!id) throw new Error('接口返回里没有找到 voiceId。');
+      return id;
+    },
+    async synth(key, c, text, o, signal) {
+      const body = { text, voiceId:c.voiceId, modelId:c.model,
+        audioConfig:{ audioEncoding:'LINEAR16', sampleRateHertz:SAMPLE_RATE, speakingRate:RATE[o.pace] } };
+      if (/tts-2/.test(c.model)) body.deliveryMode = ['STABLE', 'BALANCED', 'CREATIVE'][o.expr];
+      const res = await okOrThrow(await xfetch('inworld', '/tts/v1/voice', {
+        method:'POST', signal, headers:{ ...inworldAuth(key), 'Content-Type':'application/json' }, body: JSON.stringify(body),
+      }));
+      const b = await res.json();
+      if (!b.audioContent) throw new Error('接口返回里没有音频数据。');
+      return pcmFromAudio(b64ToBytes(b.audioContent));
+    },
+    async remove(key, c) {
+      await okOrThrow(await xfetch('inworld', '/voices/v1/voices/' + encodeURIComponent(c.voiceId), { method:'DELETE', headers: inworldAuth(key) }));
+    },
+  },
+
+  elevenlabs: {
+    async clone(key, name, src, con, model, signal) {
+      const fd = new FormData();
+      fd.append('name', name); fd.append('files', sampleFile(src));
+      const res = await okOrThrow(await xfetch('elevenlabs', '/v1/voices/add', { method:'POST', signal, headers:{ 'xi-api-key':key }, body:fd }));
+      const b = await res.json();
+      if (!b.voice_id) throw new Error('接口返回里没有找到 voice_id。');
+      return b.voice_id;
+    },
+    async synth(key, c, text, o, signal) {
+      const body = { text, model_id:c.model };
+      if (RATE[o.pace] !== 1) body.voice_settings = { speed:RATE[o.pace] };
+      const res = await okOrThrow(await xfetch('elevenlabs', '/v1/text-to-speech/' + encodeURIComponent(c.voiceId) + '?output_format=pcm_24000', {
+        method:'POST', signal, headers:{ 'xi-api-key':key, 'Content-Type':'application/json' }, body: JSON.stringify(body),
+      }));
+      return pcmFromAudio(new Uint8Array(await res.arrayBuffer()));
+    },
+    async remove(key, c) {
+      await okOrThrow(await xfetch('elevenlabs', '/v1/voices/' + encodeURIComponent(c.voiceId), { method:'DELETE', headers:{ 'xi-api-key':key } }));
+    },
+  },
+
+  fish: {
+    async clone(key, name, src, con, model, signal) {
+      const fd = new FormData();
+      fd.append('type', 'tts'); fd.append('title', name); fd.append('train_mode', 'fast');
+      fd.append('visibility', 'private'); fd.append('voices', sampleFile(src));
+      const res = await okOrThrow(await xfetch('fish', '/model', { method:'POST', signal, headers:{ Authorization:'Bearer ' + key }, body:fd }));
+      const b = await res.json();
+      if (!b._id) throw new Error('接口返回里没有找到模型 ID。');
+      return b._id;
+    },
+    async synth(key, c, text, o, signal) {
+      const res = await okOrThrow(await xfetch('fish', '/v1/tts', {
+        method:'POST', signal, headers:{ Authorization:'Bearer ' + key, 'Content-Type':'application/json', model:c.model },
+        body: JSON.stringify({ text, reference_id:c.voiceId, format:'pcm', sample_rate:SAMPLE_RATE, prosody:{ speed:RATE[o.pace] } }),
+      }));
+      return pcmFromAudio(new Uint8Array(await res.arrayBuffer()));
+    },
+    async remove(key, c) {
+      await okOrThrow(await xfetch('fish', '/model/' + encodeURIComponent(c.voiceId), { method:'DELETE', headers:{ Authorization:'Bearer ' + key } }));
+    },
+  },
+};
+
+// ── 采集:上传 / 拖拽 / 现场录音,统一转成 24kHz 单声道 ──
+const cap = { src:null, con:null };
+const capUrl = {};
+function clearCapture(p) {
+  cap[p] = null;
+  if (capUrl[p]) { URL.revokeObjectURL(capUrl[p]); capUrl[p] = null; }
+  el(p + 'Audio').style.display = 'none';
+  el(p + 'Info').textContent = '';
+  el(p + 'Rec').textContent = p === 'src' ? '● 现场录音' : '● 录这句话';
+}
+async function setCapture(p, blob) {
+  const info = el(p + 'Info');
+  info.textContent = '处理中…';
+  try {
+    const r = await toPcm24k(blob, CAP[p].max);
+    if (r.secs < CAP[p].min) throw new Error('太短了(' + r.secs.toFixed(1) + ' 秒),至少需要 ' + CAP[p].min + ' 秒。');
+    cap[p] = r;
+    if (capUrl[p]) URL.revokeObjectURL(capUrl[p]);
+    capUrl[p] = URL.createObjectURL(pcmToWav(r.pcm));
+    const a = el(p + 'Audio');
+    a.src = capUrl[p]; a.style.display = 'block';
+    info.textContent = '✓ ' + r.secs.toFixed(1) + ' 秒,可以先回放听一下'
+      + (r.clipped ? ' · 只保留了前 ' + CAP[p].max + ' 秒' : '')
+      + (p === 'src' && r.secs < 10 ? ' · 建议 10 秒以上,效果更稳' : '');
+  } catch (e) {
+    cap[p] = null;
+    el(p + 'Audio').style.display = 'none';
+    info.textContent = '✕ ' + e.message;
+  }
+}
+
+let rec = null;
+async function toggleRec(p) {
+  if (rec) { if (rec.p === p && rec.mr.state === 'recording') rec.mr.stop(); return; }
+  const info = el(p + 'Info');
+  if (!navigator.mediaDevices || !window.MediaRecorder || !window.isSecureContext) {
+    info.textContent = '✕ 当前打开方式不支持录音(需要 https)。请改用上传,或从 Vercel 地址打开。';
+    return;
+  }
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio:true }); }
+  catch (e) { info.textContent = '✕ 没有拿到麦克风权限。请在浏览器里允许麦克风,或改用上传。'; return; }
+  const mr = new MediaRecorder(stream), chunks = [], t0 = Date.now(), btn = el(p + 'Rec');
+  rec = { p, mr };
+  mr.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+  const tick = setInterval(() => {
+    const s = (Date.now() - t0) / 1000;
+    btn.textContent = '■ 停止 · ' + Math.floor(s) + 's';
+    if (s >= CAP[p].max && mr.state === 'recording') mr.stop();
+  }, 250);
+  mr.onstop = () => {
+    clearInterval(tick);
+    stream.getTracks().forEach(t => t.stop());
+    btn.classList.remove('on'); btn.textContent = '● 重新录音';
+    rec = null;
+    setCapture(p, new Blob(chunks, { type: mr.mimeType || 'audio/webm' }));
+  };
+  btn.classList.add('on'); btn.textContent = '■ 停止 · 0s';
+  info.textContent = '';
+  mr.start();
+}
+
+function wireCapture(p) {
+  const drop = el(p + 'Drop'), file = el(p + 'File');
+  el(p + 'Pick').addEventListener('click', () => file.click());
+  el(p + 'Rec').addEventListener('click', () => toggleRec(p));
+  file.addEventListener('change', () => { if (file.files[0]) setCapture(p, file.files[0]); file.value = ''; });
+  ['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => { const f = e.dataTransfer && e.dataTransfer.files[0]; if (f) setCapture(p, f); });
+}
+
+// ── 面板 ──
+function cloneMsg(text, kind) { const m = el('cMsg'); m.textContent = text || ''; m.className = kind || 'hint'; }
+
+function renderSaved() {
+  const wrap = el('savedList'), act = activeClone();
+  wrap.innerHTML = '';
+  el('savedWrap').style.display = cloneStore.list.length ? 'flex' : 'none';
+  cloneStore.list.forEach(c => {
+    const row = document.createElement('div');
+    row.className = 'saved' + (act && act.id === c.id ? ' on' : '');
+    const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = c.name;
+    const eg = document.createElement('span'); eg.className = 'eg mono'; eg.textContent = ENGINES[c.engine].name;
+    const rm = document.createElement('button'); rm.type = 'button'; rm.className = 'link-btn mono rm'; rm.textContent = '删除';
+    rm.addEventListener('click', e => {
+      e.stopPropagation();
+      if (rm.dataset.sure) return removeClone(c);
+      rm.dataset.sure = '1'; rm.textContent = '确认删除?';
+      setTimeout(() => { delete rm.dataset.sure; rm.textContent = '删除'; }, 3000);
+    });
+    row.addEventListener('click', () => { cloneStore.active = c.id; saveClones(); renderSaved(); renderVoices(); });
+    row.append(nm, eg, rm);
+    wrap.appendChild(row);
+  });
+  if (!cloneStore.list.length) el('cloneNew').open = true;
+}
+
+async function removeClone(c) {
+  cloneStore.list = cloneStore.list.filter(x => x.id !== c.id);
+  if (cloneStore.active === c.id) cloneStore.active = cloneStore.list[0] ? cloneStore.list[0].id : null;
+  saveClones(); renderSaved(); renderVoices();
+  const key = keyFor(c.engine);
+  try {
+    if (!key) throw new Error('本机没有这个引擎的 Key');
+    await ADAPTERS[c.engine].remove(key, c);
+    cloneMsg('已删除「' + c.name + '」,本机和 ' + ENGINES[c.engine].name + ' 云端都已清除。', 'good');
+  } catch (e) {
+    cloneMsg('已从本机移除「' + c.name + '」,但云端没有删掉(' + netMsg(e) + ')。可以到 ' + ENGINES[c.engine].name + ' 后台手动删除。', 'bad');
+  }
+}
+
+function onEngine() {
+  const eng = el('cEngine').value, E = ENGINES[eng], third = !!E.host;
+  cloneStore.engine = eng; saveClones();
+  ['cKeyRow', 'cModelRow', 'cConnRow'].forEach(id => { el(id).style.display = third ? 'flex' : 'none'; });
+  el('consentBox').style.display = E.needsConsent ? 'flex' : 'none';
+  el('nameStep').textContent = (E.needsConsent ? '③' : '②') + ' 命名并创建';
+  el('cKey').value = third ? (store.get(E.keyLS) || '') : '';
+  el('cKey').placeholder = E.keyHint || '';
+  el('cModel').value = E.model || '';
+  el('cNote').textContent = E.note;
+  cloneMsg('');
+}
+
+let creating = false;
+async function createClone() {
+  if (creating) return;
+  const eng = el('cEngine').value, E = ENGINES[eng];
+  const name = el('cName').value.trim();
+  if (E.host && el('cKey').value.trim()) store.set(E.keyLS, el('cKey').value.trim());
+  const key = keyFor(eng);
+  if (!key) return cloneMsg(E.host ? '请先填入 ' + E.name + ' 的 API Key。' : '请先在页面顶部保存 Gemini API Key。', 'bad');
+  if (!cap.src) return cloneMsg('还没有参考音频,请先上传或录一段。', 'bad');
+  if (E.needsConsent && !cap.con) return cloneMsg('还差授权声明的录音。', 'bad');
+  if (!name) return cloneMsg('请给这个音色起个名字。', 'bad');
+
+  creating = true;
+  el('cCreate').disabled = true;
+  cloneMsg('正在创建专属音色,通常需要几秒到几十秒…');
+  try {
+    const model = (el('cModel').value.trim() || E.model || '');
+    const voiceId = await ADAPTERS[eng].clone(key, name, wavBytes(cap.src.pcm), cap.con ? wavBytes(cap.con.pcm) : null, model);
+    const c = { id:'c' + Date.now().toString(36), name, engine:eng, voiceId, model, at:Date.now() };
+    cloneStore.list.unshift(c); cloneStore.active = c.id; saveClones();
+    clearCapture('src'); clearCapture('con');
+    el('cName').value = '';
+    el('cloneNew').open = false;
+    renderSaved(); renderVoices();
+    cloneMsg('✓「' + name + '」已创建并选中。点上面的「试听当前音色」听一下效果。', 'good');
+  } catch (e) {
+    cloneMsg('✕ 创建失败:' + netMsg(e), 'bad');
+  } finally {
+    creating = false;
+    el('cCreate').disabled = false;
+  }
+}
+
+function initClone() {
+  loadClones();
+  el('cEngine').value = cloneStore.engine;
+  el('cConn').value = cloneStore.conn;
+  el('conText').textContent = CONSENT[el('cLocale').value];
+  wireCapture('src'); wireCapture('con');
+  el('cEngine').addEventListener('change', onEngine);
+  el('cConn').addEventListener('change', () => { cloneStore.conn = el('cConn').value; saveClones(); });
+  el('cLocale').addEventListener('change', () => { el('conText').textContent = CONSENT[el('cLocale').value]; clearCapture('con'); });
+  el('cKeySave').addEventListener('click', () => {
+    const E = ENGINES[el('cEngine').value], k = el('cKey').value.trim();
+    if (!E.keyLS || !k) return cloneMsg('请先填入 API Key。', 'bad');
+    store.set(E.keyLS, k); cloneMsg('✓ Key 已保存在本机。', 'good');
+  });
+  el('cCreate').addEventListener('click', createClone);
+  onEngine();
+  renderSaved();
 }
 
 /* ── 初始化 ── */
 (function init() {
   const p = loadPrefs();
-  if (SCENES.some(s => s.id === p.scene)) sceneId = p.scene;
+  if (p.scene === 'clone' || SCENES.some(s => s.id === p.scene)) sceneId = p.scene;
   if (Number.isInteger(p.pace) && PACE[p.pace]) el('pace').value = p.pace;
   if (Number.isInteger(p.expr) && EXPR[p.expr]) el('expr').value = p.expr;
   if (typeof p.smart === 'boolean') el('smart').checked = p.smart;
@@ -623,6 +1218,7 @@ function preview() {
   el('customVoice').addEventListener('change', savePrefs);
 
   syncLabels();
+  initClone();
   renderVoices();
 })();
 </script>
