@@ -22,71 +22,96 @@
     background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.09);
     border-radius:16px; padding:16px; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
   }
-  header { display:flex; align-items:center; justify-content:space-between; }
+  .mono { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+  header { display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .logo { display:flex; align-items:center; gap:10px; }
   .logo-cube {
     width:38px; height:38px; border-radius:11px; display:grid; place-items:center; font-size:18px;
     background:linear-gradient(135deg,#22d3ee,#8b5cf6); box-shadow:0 0 18px rgba(34,211,238,.35);
   }
-  h1 { font-size:16px; letter-spacing:.25em; background:linear-gradient(90deg,#67e8f9,#c4b5fd); -webkit-background-clip:text; background-clip:text; color:transparent; }
-  .sub { font-size:10px; color:#64748b; letter-spacing:.15em; font-family:ui-monospace,monospace; }
+  h1 { font-size:16px; letter-spacing:.12em; background:linear-gradient(90deg,#67e8f9,#c4b5fd); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { font-size:10px; color:#64748b; letter-spacing:.12em; }
   .dot { width:8px; height:8px; border-radius:50%; background:#34d399; box-shadow:0 0 8px #34d399; animation:pulse 1.6s infinite; display:inline-block; margin-right:6px; }
   @keyframes pulse { 50% { opacity:.4; } }
-  .status { font-size:10px; font-family:ui-monospace,monospace; color:#6ee7b7; letter-spacing:.1em; }
-  label { display:block; font-size:11px; letter-spacing:.2em; color:#7dd3fc; font-family:ui-monospace,monospace; margin-bottom:8px; }
+  .status { font-size:10px; color:#6ee7b7; letter-spacing:.1em; white-space:nowrap; }
+  label.sec { display:block; font-size:11px; letter-spacing:.2em; color:#7dd3fc; margin-bottom:10px; }
   textarea {
-    width:100%; height:150px; resize:vertical; border-radius:12px; padding:12px;
+    width:100%; height:170px; resize:vertical; border-radius:12px; padding:12px;
     background:rgba(0,0,0,.35); border:1px solid rgba(34,211,238,.2); color:#e2e8f0;
     font-size:15px; line-height:1.7; outline:none; font-family:inherit;
   }
   textarea:focus { border-color:rgba(34,211,238,.6); box-shadow:0 0 18px rgba(34,211,238,.12); }
-  .meta { display:flex; justify-content:space-between; margin-top:6px; font-size:10px; color:#64748b; font-family:ui-monospace,monospace; }
-  .clear-btn { color:#fca5a5; background:none; border:none; cursor:pointer; font-size:10px; font-family:ui-monospace,monospace; letter-spacing:.1em; }
-  .voices { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-  @media(min-width:560px){ .voices { grid-template-columns:repeat(6,1fr); } }
+  .meta { display:flex; justify-content:space-between; margin-top:6px; font-size:10px; color:#64748b; }
+  .link-btn { background:none; border:none; cursor:pointer; font-size:10px; letter-spacing:.1em; font-family:inherit; }
+  .presets { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .chip { font-size:10px; letter-spacing:.05em; color:#c4b5fd;
+    border:1px solid rgba(167,139,250,.3); background:rgba(167,139,250,.06); border-radius:8px; padding:6px 10px; cursor:pointer; font-family:inherit; }
+
+  /* ── 音色矩阵 ── */
+  .voices { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+  @media(min-width:620px){ .voices { grid-template-columns:repeat(3,1fr); } }
   .voice {
-    border:1px solid rgba(255,255,255,.1); background:rgba(0,0,0,.3); border-radius:12px;
-    padding:10px 4px; text-align:center; cursor:pointer; transition:.2s; color:#94a3b8;
+    border:1px solid rgba(255,255,255,.1); background:rgba(0,0,0,.3); border-radius:14px;
+    padding:12px; cursor:pointer; transition:.2s; text-align:left; color:inherit; font-family:inherit;
+    display:flex; flex-direction:column; gap:6px; min-height:132px;
   }
-  .voice .vn { font-size:12px; font-weight:600; color:#e2e8f0; }
-  .voice .vd { font-size:9px; margin-top:3px; font-family:ui-monospace,monospace; }
-  .voice.on { border-color:#22d3ee; background:rgba(34,211,238,.1); box-shadow:0 0 14px rgba(34,211,238,.25); color:#67e8f9; }
-  .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-  .row > * { flex:1; }
-  select, input[type=password] {
+  .voice .vg { font-size:9px; letter-spacing:.15em; color:#64748b; }
+  .voice .vn { font-size:14px; font-weight:600; color:#f1f5f9; line-height:1.3; }
+  .voice .vt { display:flex; flex-wrap:wrap; gap:4px; }
+  .voice .vt span { font-size:9px; padding:2px 6px; border-radius:99px; border:1px solid rgba(255,255,255,.12); color:#94a3b8; }
+  .voice .vs { font-size:11px; line-height:1.5; color:#94a3b8; margin-top:auto; }
+  .voice.on { border-color:#22d3ee; background:rgba(34,211,238,.08); box-shadow:0 0 16px rgba(34,211,238,.22); }
+  .voice.on .vt span { border-color:rgba(34,211,238,.4); color:#a5f3fc; }
+  .voice.on .vg { color:#67e8f9; }
+  .tip { margin-top:10px; font-size:11px; line-height:1.6; color:#94a3b8; border-left:2px solid rgba(34,211,238,.4); padding-left:10px; }
+
+  .row { display:flex; gap:10px; align-items:center; }
+  .row > .grow { flex:1; min-width:0; }
+  .rl { flex:0 0 64px; font-size:11px; color:#94a3b8; }
+  select, input[type=password], input[type=text] {
     width:100%; background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.12); color:#cbd5e1;
-    border-radius:10px; padding:10px; font-size:13px; font-family:ui-monospace,monospace; outline:none;
+    border-radius:10px; padding:10px; font-size:13px; outline:none; font-family:ui-monospace,monospace;
   }
-  input[type=range]{ width:100%; appearance:none; height:5px; border-radius:99px; background:rgba(255,255,255,.1); outline:none; }
+  input[type=range]{ width:100%; -webkit-appearance:none; appearance:none; height:5px; border-radius:99px; background:rgba(255,255,255,.1); outline:none; }
   input[type=range]::-webkit-slider-thumb{
-    appearance:none; width:18px; height:18px; border-radius:50%; background:#fff;
+    -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%; background:#fff;
     box-shadow:0 0 10px rgba(34,211,238,.9); cursor:pointer;
   }
-  .val { font-family:ui-monospace,monospace; font-size:12px; color:#67e8f9; min-width:44px; text-align:right; flex:0; }
-  .gen {
+  input[type=range]::-moz-range-thumb{ width:20px; height:20px; border:none; border-radius:50%; background:#fff; box-shadow:0 0 10px rgba(34,211,238,.9); cursor:pointer; }
+  .val { flex:0 0 46px; font-size:12px; color:#67e8f9; text-align:right; }
+  .stack { display:flex; flex-direction:column; gap:14px; }
+  details summary { cursor:pointer; font-size:11px; letter-spacing:.2em; color:#7dd3fc; list-style:none; }
+  details summary::-webkit-details-marker { display:none; }
+  details summary::after { content:" ▸"; }
+  details[open] summary::after { content:" ▾"; }
+  details .stack { margin-top:14px; }
+  .check { display:flex; align-items:flex-start; gap:8px; font-size:12px; color:#cbd5e1; line-height:1.5; }
+  .check input { margin-top:3px; accent-color:#22d3ee; }
+
+  .btn {
     width:100%; padding:15px; border-radius:14px; border:1px solid rgba(34,211,238,.4); cursor:pointer;
     background:linear-gradient(90deg,rgba(34,211,238,.18),rgba(139,92,246,.18));
-    color:#a5f3fc; font-size:14px; letter-spacing:.25em; font-family:ui-monospace,monospace;
+    color:#a5f3fc; font-size:14px; letter-spacing:.2em; font-family:inherit;
     transition:.2s; position:relative; overflow:hidden;
   }
-  .gen:not(:disabled):hover { box-shadow:0 0 24px rgba(34,211,238,.3); }
-  .gen:disabled { opacity:.45; cursor:not-allowed; }
+  .btn:not(:disabled):hover { box-shadow:0 0 24px rgba(34,211,238,.3); }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
+  .btn.ghost { background:rgba(0,0,0,.3); border-color:rgba(255,255,255,.14); color:#cbd5e1; padding:11px; font-size:12px; }
+  .btn.small { width:auto; flex:0 0 84px; padding:10px; font-size:12px; letter-spacing:.1em; }
   .bar { position:absolute; inset:0; width:0%; background:rgba(34,211,238,.18); transition:width .3s; }
-  .gen span { position:relative; }
+  .btn span { position:relative; }
   .player { display:none; flex-direction:column; gap:10px; }
   .player.show { display:flex; }
   audio { width:100%; height:40px; }
   .dl {
     display:block; text-align:center; padding:13px; border-radius:12px; text-decoration:none;
     border:1px solid rgba(52,211,153,.45); background:rgba(52,211,153,.1); color:#6ee7b7;
-    font-size:12px; letter-spacing:.2em; font-family:ui-monospace,monospace;
+    font-size:12px; letter-spacing:.15em;
   }
   .dl:active { background:rgba(52,211,153,.25); }
-  .err { color:#fca5a5; font-size:12px; font-family:ui-monospace,monospace; display:none; }
-  .hint { font-size:10px; color:#475569; font-family:ui-monospace,monospace; line-height:1.6; }
-  .presets { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-  .preset { font-size:10px; font-family:ui-monospace,monospace; letter-spacing:.05em; color:#c4b5fd;
-    border:1px solid rgba(167,139,250,.3); background:rgba(167,139,250,.06); border-radius:8px; padding:6px 10px; cursor:pointer; }
+  .err { color:#fca5a5; font-size:12px; line-height:1.6; display:none; word-break:break-word; }
+  .hint { font-size:10px; color:#64748b; line-height:1.7; }
+  .hint a { color:#7dd3fc; }
 </style>
 </head>
 <body>
@@ -97,181 +122,509 @@
       <div class="logo-cube">🎙️</div>
       <div>
         <h1>advanced-tts</h1>
-        <div class="sub">AI VOICEOVER STUDIO · 社媒配音工作台</div>
+        <div class="sub mono">AI VOICEOVER STUDIO · 社媒配音工作台</div>
       </div>
     </div>
-    <div class="status"><span class="dot"></span>READY</div>
+    <div class="status mono"><span class="dot"></span>GEMINI 3.8 TTS</div>
   </header>
 
   <!-- API KEY(首次输入,本机保存) -->
   <section class="card" id="keyCard">
-    <label>◈ OPENAI API KEY(仅保存在本设备)</label>
+    <label class="sec mono">◈ GEMINI API KEY(仅保存在本设备)</label>
     <div class="row">
-      <input type="password" id="apiKey" placeholder="sk-...">
-      <button class="gen" style="flex:0 0 90px;padding:10px" onclick="saveKey()"><span>保存</span></button>
+      <div class="grow"><input type="password" id="apiKey" placeholder="粘贴 Google AI Studio 的 API Key" autocomplete="off"></div>
+      <button class="btn small" onclick="saveKey()"><span>保存</span></button>
     </div>
-    <p class="hint" style="margin-top:8px">Key 存储于浏览器 localStorage,仅本机可见。请勿把已填入 Key 的页面分享给他人。</p>
+    <p class="hint" style="margin-top:8px">
+      在 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> 创建。
+      Key 只存在本机浏览器 localStorage,请勿把已填入 Key 的页面分享给他人。
+    </p>
   </section>
 
-  <!-- 文本 -->
+  <!-- 文稿 -->
   <section class="card">
-    <label>◈ 配音文稿</label>
-    <textarea id="text" placeholder="在这里粘贴你的社媒文案……支持中英文混合。"></textarea>
-    <div class="meta">
-      <span>字数:<b id="count" style="color:#67e8f9">0</b> / 4096</span>
-      <button class="clear-btn" onclick="clearText()">✕ 清空</button>
+    <label class="sec mono">◈ 配音文稿</label>
+    <textarea id="text" placeholder="在这里粘贴你的文案,支持中英文混合。&#10;空一行 = 段落停顿;想手动加气口可以写 [停] 或 [长停]。"></textarea>
+    <div class="meta mono">
+      <span>字数:<b id="count" style="color:#67e8f9">0</b> / 5000 · 预计分 <b id="segs" style="color:#67e8f9">0</b> 段合成</span>
+      <button class="link-btn mono" style="color:#fca5a5" onclick="clearText()">✕ 清空</button>
     </div>
     <div class="presets">
-      <button class="preset" onclick="fillPreset(0)">开场白模板</button>
-      <button class="preset" onclick="fillPreset(1)">科技快讯模板</button>
-      <button class="preset" onclick="fillPreset(2)">带货结尾模板</button>
+      <button class="chip mono" onclick="fillPreset(0)">纪录片开场</button>
+      <button class="chip mono" onclick="fillPreset(1)">科技快讯</button>
+      <button class="chip mono" onclick="fillPreset(2)">悬念故事</button>
     </div>
   </section>
 
   <!-- 音色矩阵 -->
   <section class="card">
-    <label>◈ 音色矩阵 VOICE MATRIX</label>
+    <label class="sec mono">◈ 音色矩阵 VOICE MATRIX</label>
     <div class="voices" id="voices"></div>
+    <p class="tip" id="sceneTip"></p>
+    <button class="btn ghost" id="previewBtn" style="margin-top:12px" onclick="preview()"><span>▶ 试听当前音色(一句样音)</span></button>
   </section>
 
-  <!-- 参数 -->
+  <!-- 高级设置 -->
   <section class="card">
-    <label>◈ 参数</label>
-    <div class="row" style="margin-bottom:12px">
-      <span class="hint" style="flex:0 0 56px">语速</span>
-      <input type="range" id="speed" min="0.5" max="1.5" step="0.05" value="1" oninput="spdVal.textContent=this.value+'x'">
-      <span class="val" id="spdVal">1x</span>
-    </div>
-    <div class="row">
-      <span class="hint" style="flex:0 0 56px">音质</span>
-      <select id="model">
-        <option value="tts-1">tts-1 · 标准(快/省)</option>
-        <option value="tts-1-hd" selected>tts-1-hd · 高清(推荐配音)</option>
-      </select>
-    </div>
+    <details id="adv">
+      <summary class="mono">◈ 高级设置(默认即推荐值)</summary>
+      <div class="stack">
+        <div class="row">
+          <span class="rl">语速</span>
+          <div class="grow"><input type="range" id="pace" min="0" max="4" step="1" value="2"></div>
+          <span class="val mono" id="paceVal">自然</span>
+        </div>
+        <div class="row">
+          <span class="rl">情绪张力</span>
+          <div class="grow"><input type="range" id="expr" min="0" max="2" step="1" value="1"></div>
+          <span class="val mono" id="exprVal">自然</span>
+        </div>
+        <label class="check"><input type="checkbox" id="smart" checked>
+          <span>智能气口:段落间自动停顿、长句在转折词前加逗号、换行自动收句</span></label>
+        <label class="check"><input type="checkbox" id="useStyle" checked>
+          <span>注入风格指令(关掉 = 只用音色本身,最朴素;觉得"演过头"时关它)</span></label>
+        <div class="row">
+          <span class="rl">底层音色</span>
+          <div class="grow"><select id="altVoice"></select></div>
+        </div>
+        <div class="row">
+          <span class="rl">自定义 ID</span>
+          <div class="grow"><input type="text" id="customVoice" placeholder="可选:AI Studio 里的音色名或 voice_... ID" autocomplete="off"></div>
+        </div>
+        <div class="row">
+          <span class="rl">模型</span>
+          <div class="grow">
+            <select id="model">
+              <option value="gemini-3.8-flash-tts" selected>gemini-3.8-flash-tts · 旗舰(推荐配音)</option>
+              <option value="gemini-3.8-flash-lite-tts">gemini-3.8-flash-lite-tts · 快/省</option>
+            </select>
+          </div>
+        </div>
+        <p class="hint">Gemini TTS 没有数值倍速参数,语速和张力都是通过风格指令实现的 5 档 / 3 档,不是精确倍率。需要精确变速请在剪映里调。</p>
+      </div>
+    </details>
   </section>
 
   <!-- 生成 -->
-  <button class="gen" id="genBtn" onclick="generate()">
+  <button class="btn" id="genBtn" onclick="generate()">
     <div class="bar" id="bar"></div>
     <span id="genLabel">⚡ 生成配音</span>
   </button>
-  <p class="err" id="err"></p>
+  <p class="err mono" id="err"></p>
 
   <!-- 播放器 -->
   <section class="card player" id="player">
-    <label>◈ 成品音频</label>
+    <label class="sec mono" id="playerTitle">◈ 成品音频</label>
     <audio id="audio" controls></audio>
-    <a class="dl" id="dl" download>⬇ 下载 MP3(可直接导入剪映 / CapCut)</a>
+    <a class="dl mono" id="dl" download>⬇ 下载 WAV(无损,可直接导入剪映 / CapCut)</a>
+    <p class="hint mono" id="audioMeta"></p>
   </section>
 
-  <p class="hint" style="text-align:center">advanced-tts · Powered by OpenAI TTS · 手机端可"添加到主屏幕"作为独立 App 使用</p>
+  <p class="hint mono" style="text-align:center">advanced-tts · Powered by Gemini 3.8 TTS · 手机端可"添加到主屏幕"作为独立 App 使用</p>
 </div>
 
 <script>
-const VOICES = [
-  { id:'alloy',   name:'Alloy',   desc:'中性 · 通用' },
-  { id:'echo',    name:'Echo',    desc:'男声 · 沉稳' },
-  { id:'fable',   name:'Fable',   desc:'英伦 · 叙事' },
-  { id:'onyx',    name:'Onyx',    desc:'男声 · 磁性' },
-  { id:'nova',    name:'Nova',    desc:'女声 · 明快' },
-  { id:'shimmer', name:'Shimmer', desc:'女声 · 柔和' },
+/* ═══════════════════════════════════════════════════════════════
+   1. 音色矩阵配置
+   voice  = Gemini 预置音色名(主选)
+   alts   = 同一场景的备选底层音色,可在高级设置里切换
+   style  = 写进 speech_metadata.style 的短指令。Google 文档明确建议
+            保持简短:长篇"导演笔记"反而会造成音色漂移。
+   para   = 段落之间插入的停顿标签
+   ═══════════════════════════════════════════════════════════════ */
+const SCENES = [
+  { id:'documentary', gender:'男声', name:'深度纪录', tags:['沉稳磁性','权威播音'],
+    scene:'宏观叙事、科技解读、深度专栏',
+    voice:'Charon', alts:['Charon','Rasalgethi','Alnilam','Orus'],
+    style:'authoritative documentary narration, calm and grounded, measured pace',
+    para:'<short pause>',
+    tip:'这条声线靠重音立住。关键数字或结论前单独成句,效果最好。',
+    sample:'过去十年,全球数据总量增长了三十倍。真正改变世界的,从来不是数据本身,而是我们理解它的方式。' },
+  { id:'interview', gender:'女声', name:'知性讲述', tags:['温润理性','访谈主持'],
+    scene:'文化访谈、知识讲解、人物专题',
+    voice:'Gacrux', alts:['Gacrux','Kore','Sulafat','Erinome'],
+    style:'thoughtful interview host, composed and warm, unhurried',
+    para:'<short pause>',
+    tip:'适合带设问的文稿。问句后空一行,会留出思考的间隙。',
+    sample:'我们常说要拥抱变化。可是,当变化真的来到面前,我们准备好了吗?今天,想和你聊聊这个问题。' },
+  { id:'podcast', gender:'男声', name:'随和聊天', tags:['口语松弛','播客主理人'],
+    scene:'观点输出、故事讲述、日常分享',
+    voice:'Zubenelgenubi', alts:['Zubenelgenubi','Achird','Umbriel','Puck'],
+    style:'casual and relaxed, like chatting with a friend over coffee',
+    para:'<short pause>',
+    tip:'文稿越口语越像真人。可以直接写"嗯""其实吧""你知道吗",模型会照着说出来。',
+    sample:'其实吧,我一开始也不太相信这件事。后来自己试了一下,嗯,还真有点意思。' },
+  { id:'lifestyle', gender:'女声', name:'松弛叙事', tags:['自然亲和','生活美学'],
+    scene:'散文随笔、人物故事、治愈系内容',
+    voice:'Sulafat', alts:['Sulafat','Vindemiatrix','Callirrhoe','Achernar'],
+    style:'soft and relaxed, gentle storytelling, slightly slow',
+    para:'<long pause>',
+    tip:'短句、多分段。段与段之间会自动留长一点的空白。',
+    sample:'清晨六点,巷口的豆浆店已经亮了灯。日子就是这样,在一些很小的事情里,慢慢变得踏实。' },
+  { id:'geek', gender:'男声', name:'硬核极客', tags:['明快利落','商业洞察'],
+    scene:'快节奏科普、趋势分析、产品解读',
+    voice:'Sadaltager', alts:['Sadaltager','Iapetus','Fenrir','Puck'],
+    style:'crisp and confident, energetic keynote delivery, brisk pace',
+    para:'<short pause>',
+    tip:'一句一个信息点,少用长从句。数字和结论放在句尾更有力。',
+    sample:'三个数字,看懂这次发布。成本降了一半,速度快了四倍,而价格,没有变。' },
+  { id:'suspense', gender:'低沉男声', name:'悬念旁白', tags:['画面感','沉浸叙事'],
+    scene:'历史故事、科幻设想、深度推演',
+    voice:'Algenib', alts:['Algenib','Enceladus','Charon','Schedar'],
+    style:'low and hushed, suspenseful storytelling, deliberate pauses',
+    para:'<long pause>',
+    tip:'想留白的地方写 [长停],或者用省略号。转折前断一句,悬念就出来了。',
+    sample:'那一夜,整座城市的灯同时熄灭了。没有人知道为什么……直到第二天清晨,有人在广场上发现了那封信。' },
 ];
+
+const PACE = [
+  { label:'舒缓', style:'speaking slowly' },
+  { label:'略慢', style:'slightly slower pace' },
+  { label:'自然', style:'' },
+  { label:'略快', style:'slightly faster pace' },
+  { label:'明快', style:'brisk pace' },
+];
+const EXPR = [
+  { label:'克制', style:'understated, restrained' },
+  { label:'自然', style:'' },
+  { label:'饱满', style:'more expressive, wider dynamic range' },
+];
+
 const PRESETS = [
-  '大家好,欢迎回到我的频道!今天要跟你们聊一个可能改变未来十年的话题——',
-  '今日科技快讯:人工智能与区块链的融合正在加速,一个可信、可验证的数字新世界正在成形。三十秒,带你看懂这件大事。',
-  '如果你也觉得有用,记得点赞加关注,我们下期不见不散!',
+  '一百年前,人类第一次把声音送过大西洋。\n\n今天,一段文字只需要几秒钟,就能变成任何语言里的一个声音。\n\n技术走得很快。但我们想讲的故事,其实从来没有变过。',
+  '今日科技快讯。人工智能与区块链的融合正在加速,一个可信、可验证的数字世界正在成形。三十秒,带你看懂这件事。\n\n第一,身份。第二,凭证。第三,信任的成本。',
+  '档案的最后一页,是空白的。\n\n调查员翻过来,又翻回去。[长停]然后他注意到,纸的右下角,有一行铅笔写的小字……\n\n那是一个日期。而那一天,还没有到来。',
 ];
-let voice = 'nova';
-let lastBlobUrl = null;
 
-// ── 初始化 ──
-const vGrid = document.getElementById('voices');
-VOICES.forEach(v => {
-  const b = document.createElement('div');
-  b.className = 'voice' + (v.id === voice ? ' on' : '');
-  b.innerHTML = `<div class="vn">${v.name}</div><div class="vd">${v.desc}</div>`;
-  b.onclick = () => { voice = v.id; document.querySelectorAll('.voice').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
-  vGrid.appendChild(b);
-});
+const API = 'https://generativelanguage.googleapis.com/v1beta/interactions';
+const SAMPLE_RATE = 24000;
+const CHUNK_LIMIT = 1200;      // 每段最多字符数,超过就按句子边界拆成多次请求
+const MAX_CHARS = 5000;
+const LS = { key:'advanced-tts_gemini_key', prefs:'advanced-tts_prefs' };
 
-const ta = document.getElementById('text');
+/* ═══════════════════════════════════════════════════════════════
+   2. 真人感预处理:把纯文本整理成"带气口的讲稿"
+   Gemini 3.8 把 text 当作逐字稿照念,所以气口必须写进稿子里:
+   标点负责自然停顿,<short pause>/<long pause> 负责明确的空白。
+   ═══════════════════════════════════════════════════════════════ */
+const HAN = /[\u4e00-\u9fff]/;
+const END_PUNCT = /[。！？!?…．.,，、；;：:—~」』”’）)>]$/;
+const CONNECTIVES = ['但是','所以','因此','而且','并且','尽管','虽然','因为'];
+// 这些字后面跟转折词时是固定搭配(之所以 / 不但是 / 正因为),不能拆开
+const NO_SPLIT_BEFORE = { '所以':'之', '但是':'不', '因为':'正是只', '而且':'', '并且':'', '因此':'', '尽管':'', '虽然':'' };
+
+function normalize(text) {
+  return text.replace(/\r\n?/g, '\n').replace(/[ \t\u3000]+/g, ' ').replace(/ *\n */g, '\n').trim();
+}
+
+// 换行但没有标点 → 补一个句号,避免两行被连读成一句
+function closeLine(line) {
+  if (END_PUNCT.test(line)) return line;
+  return line + (HAN.test(line.slice(-1)) ? '。' : '.');
+}
+
+// 手写标记 → 官方停顿标签
+function manualPauses(s) {
+  return s.replace(/\[长停\]|【长停】/g, ' <long pause> ').replace(/\[停\]|【停】/g, ' <short pause> ');
+}
+
+// 连续 12 个以上汉字没有任何标点、后面又接转折词 → 在转折词前补逗号
+function addBreaths(s) {
+  const re = new RegExp('([\\u4e00-\\u9fff]{12,}?)(' + CONNECTIVES.join('|') + ')', 'g');
+  return s.replace(re, (m, before, conn) => {
+    const last = before.slice(-1);
+    if ((NO_SPLIT_BEFORE[conn] || '').includes(last)) return m;
+    return before + '，' + conn;
+  });
+}
+
+const SENT_RE = /[^。！？!?…]+[。！？!?…]*[”’」』）)]*/g;
+
+function buildChunks(raw, scene, smart) {
+  const paras = normalize(raw).split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
+  const chunks = [];
+  let cur = '';
+  const push = () => { if (cur.trim()) chunks.push(cur.trim()); cur = ''; };
+
+  paras.forEach((p, i) => {
+    let lines = p.split('\n').map(l => l.trim()).filter(Boolean);
+    if (smart) lines = lines.map(closeLine);
+    // 中文行直接相连;英文/数字结尾的行之间要留一个空格
+    let body = manualPauses(lines.reduce((acc, l) => acc + (acc && /[\x00-\x7f]$/.test(acc) ? ' ' : '') + l, ''));
+    if (smart) body = addBreaths(body);
+    const sents = body.match(SENT_RE) || [body];
+    sents.forEach(s => {
+      if (cur && cur.length + s.length > CHUNK_LIMIT) push();
+      cur += s;
+    });
+    if (i < paras.length - 1) cur += smart ? ' ' + scene.para + ' ' : ' ';
+  });
+  push();
+  return chunks;
+}
+
+function buildStyle(scene) {
+  if (!el('useStyle').checked) return '';
+  return [scene.style, PACE[+el('pace').value].style, EXPR[+el('expr').value].style].filter(Boolean).join(', ');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   3. 音频工具:base64 → PCM,多段拼接,封装 WAV
+   ═══════════════════════════════════════════════════════════════ */
+function b64ToBytes(b64) {
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+// 我们请求的是无头 PCM;万一服务端仍返回带 RIFF 头的 WAV,就把头剥掉
+function stripWavHeader(bytes) {
+  if (bytes.length < 12 || String.fromCharCode(bytes[0], bytes[1], bytes[2], bytes[3]) !== 'RIFF') return bytes;
+  for (let i = 12; i + 8 <= bytes.length; ) {
+    const id = String.fromCharCode(bytes[i], bytes[i+1], bytes[i+2], bytes[i+3]);
+    const size = bytes[i+4] | (bytes[i+5] << 8) | (bytes[i+6] << 16) | (bytes[i+7] << 24);
+    if (id === 'data') return bytes.subarray(i + 8);
+    i += 8 + size + (size % 2);
+  }
+  return bytes.subarray(44);
+}
+
+function concatPcm(parts, gapMs) {
+  const gap = new Uint8Array(Math.round(SAMPLE_RATE * gapMs / 1000) * 2);
+  let total = 0;
+  parts.forEach((p, i) => { total += p.length + (i < parts.length - 1 ? gap.length : 0); });
+  const out = new Uint8Array(total);
+  let off = 0;
+  parts.forEach((p, i) => {
+    out.set(p, off); off += p.length;
+    if (i < parts.length - 1) { out.set(gap, off); off += gap.length; }
+  });
+  return out;
+}
+
+function pcmToWav(pcm) {
+  const buf = new ArrayBuffer(44 + pcm.length);
+  const v = new DataView(buf);
+  const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  w(0, 'RIFF'); v.setUint32(4, 36 + pcm.length, true); w(8, 'WAVE');
+  w(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, SAMPLE_RATE, true); v.setUint32(28, SAMPLE_RATE * 2, true);
+  v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  w(36, 'data'); v.setUint32(40, pcm.length, true);
+  new Uint8Array(buf, 44).set(pcm);
+  return new Blob([buf], { type: 'audio/wav' });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   4. Gemini TTS 请求(Interactions API,单说话人)
+   ═══════════════════════════════════════════════════════════════ */
+async function synthChunk(key, text, voice, style, model, signal) {
+  const part = { type: 'text', text };
+  if (style) part.annotations = [{ type: 'speech_metadata', style }];
+
+  const res = await fetch(API, {
+    method: 'POST',
+    signal,
+    headers: { 'x-goog-api-key': key, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model,
+      input: [{ type: 'user_input', content: [part] }],
+      response_format: { type: 'audio', mime_type: 'audio/l16', sample_rate: SAMPLE_RATE },
+      generation_config: { speech_config: [{ voice }] },
+    }),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg = (body && body.error && body.error.message) || ('HTTP ' + res.status);
+    throw new Error(explain(res.status, msg));
+  }
+
+  let b64 = null;
+  (body.steps || []).forEach(step => {
+    if (step.type !== 'model_output') return;
+    (step.content || []).forEach(c => { if (c.type === 'audio' && c.data) b64 = c.data; });
+  });
+  if (!b64 && body.output_audio && body.output_audio.data) b64 = body.output_audio.data;
+  if (!b64) throw new Error('接口返回里没有音频数据,请稍后重试或换一个底层音色。');
+  return stripWavHeader(b64ToBytes(b64));
+}
+
+function explain(status, msg) {
+  if (status === 400 && /API key/i.test(msg)) return 'API Key 无效,请检查后重新保存。';
+  if (status === 401 || status === 403) return 'Key 没有权限或已失效(' + msg + ')';
+  if (status === 404) return '找不到模型或音色:' + msg;
+  if (status === 429) return '触发限流或配额用完了,稍等一会儿再试(' + msg + ')';
+  return msg;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   5. 界面逻辑
+   ═══════════════════════════════════════════════════════════════ */
+const el = id => document.getElementById(id);
+let sceneId = 'documentary';
+let ctrl = null;          // 正在进行的请求;非空 = 合成中
+let lastUrl = null;
+
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+};
+const scene = () => SCENES.find(s => s.id === sceneId) || SCENES[0];
+
+function renderVoices() {
+  const grid = el('voices');
+  grid.innerHTML = '';
+  SCENES.forEach(s => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'voice' + (s.id === sceneId ? ' on' : '');
+    b.innerHTML =
+      '<div class="vg mono">' + s.gender + '</div>' +
+      '<div class="vn">' + s.name + '</div>' +
+      '<div class="vt">' + s.tags.map(t => '<span>' + t + '</span>').join('') + '</div>' +
+      '<div class="vs">' + s.scene + '</div>';
+    b.onclick = () => { sceneId = s.id; renderVoices(); savePrefs(); };
+    grid.appendChild(b);
+  });
+  const s = scene();
+  el('sceneTip').textContent = s.tip;
+  const sel = el('altVoice');
+  sel.innerHTML = s.alts.map((v, i) => '<option value="' + v + '">' + v + (i === 0 ? ' · 默认' : ' · 备选') + '</option>').join('');
+  const prefs = loadPrefs();
+  const saved = prefs.alt && prefs.alt[s.id];
+  sel.value = s.alts.includes(saved) ? saved : s.voice;
+  updateSegs();
+}
+
+function currentVoice() {
+  return el('customVoice').value.trim() || el('altVoice').value || scene().voice;
+}
+
+function loadPrefs() { try { return JSON.parse(store.get(LS.prefs) || '{}') || {}; } catch (e) { return {}; } }
+function savePrefs() {
+  const p = loadPrefs();
+  p.scene = sceneId;
+  p.pace = +el('pace').value; p.expr = +el('expr').value;
+  p.smart = el('smart').checked; p.useStyle = el('useStyle').checked;
+  p.model = el('model').value; p.custom = el('customVoice').value.trim();
+  p.alt = p.alt || {}; p.alt[sceneId] = el('altVoice').value;
+  store.set(LS.prefs, JSON.stringify(p));
+}
+
+function syncLabels() {
+  el('paceVal').textContent = PACE[+el('pace').value].label;
+  el('exprVal').textContent = EXPR[+el('expr').value].label;
+}
+
+const ta = el('text');
+function updateSegs() {
+  el('count').textContent = ta.value.length;
+  el('segs').textContent = ta.value.trim() ? buildChunks(ta.value, scene(), el('smart').checked).length : 0;
+}
 ta.addEventListener('input', () => {
-  if (ta.value.length > 4096) ta.value = ta.value.slice(0, 4096);
-  document.getElementById('count').textContent = ta.value.length;
+  if (ta.value.length > MAX_CHARS) ta.value = ta.value.slice(0, MAX_CHARS);
+  updateSegs();
 });
-function clearText(){ ta.value=''; ta.dispatchEvent(new Event('input')); }
-function fillPreset(i){ ta.value = PRESETS[i]; ta.dispatchEvent(new Event('input')); }
+function clearText() { ta.value = ''; updateSegs(); }
+function fillPreset(i) { ta.value = PRESETS[i]; updateSegs(); }
 
-// ── API Key 管理 ──
-const keyInput = document.getElementById('apiKey');
-const saved = localStorage.getItem('advanced-tts_key');
-if (saved) { keyInput.value = saved; document.getElementById('keyCard').style.opacity = .6; }
-function saveKey(){
-  const k = keyInput.value.trim();
-  if (!k.startsWith('sk-')) return showErr('Key 格式不对,应以 sk- 开头');
-  localStorage.setItem('advanced-tts_key', k);
-  document.getElementById('keyCard').style.opacity = .6;
+function saveKey() {
+  const k = el('apiKey').value.trim();
+  if (k.length < 20) return showErr('这个 Key 看起来不完整,请从 AI Studio 重新复制。');
+  store.set(LS.key, k);
+  el('keyCard').style.opacity = .6;
   showErr('');
 }
 
-function showErr(msg){
-  const e = document.getElementById('err');
+function showErr(msg) {
+  const e = el('err');
   e.textContent = msg; e.style.display = msg ? 'block' : 'none';
 }
 
-// ── 生成 ──
-async function generate(){
-  const key = localStorage.getItem('advanced-tts_key');
-  const text = ta.value.trim();
-  if (!key) return showErr('请先保存你的 OpenAI API Key');
-  if (!text) return showErr('请先输入配音文稿');
+function setBusy(busy, label) {
+  el('previewBtn').disabled = busy;
+  el('genLabel').textContent = label || '⚡ 生成配音';
+  if (!busy) setTimeout(() => { el('bar').style.width = '0%'; }, 600);
+}
+
+async function run(rawText, isPreview) {
+  const key = store.get(LS.key);
+  if (!key) return showErr('请先保存你的 Gemini API Key。');
+  if (!rawText.trim()) return showErr('请先输入配音文稿。');
   showErr('');
 
-  const btn = document.getElementById('genBtn'),
-        label = document.getElementById('genLabel'),
-        bar = document.getElementById('bar');
-  btn.disabled = true;
-  label.textContent = '⟳ 合成中…';
-  let p = 0;
-  const timer = setInterval(()=>{ p = Math.min(90, p + Math.random()*12); bar.style.width = p + '%'; }, 250);
+  const s = scene();
+  const chunks = buildChunks(rawText, s, el('smart').checked);
+  const voice = currentVoice();
+  const style = buildStyle(s);
+  const model = el('model').value;
 
+  ctrl = new AbortController();
+  const parts = [];
   try {
-    const res = await fetch('https://api.openai.com/v1/audio/speech', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: document.getElementById('model').value,
-        input: text,
-        voice: voice,
-        speed: parseFloat(document.getElementById('speed').value),
-        response_format: 'mp3',
-      }),
-    });
-    if (!res.ok) {
-      const errBody = await res.json().catch(()=>({}));
-      throw new Error(errBody?.error?.message || ('HTTP ' + res.status));
+    for (let i = 0; i < chunks.length; i++) {
+      setBusy(true, '⟳ 合成中 ' + (i + 1) + '/' + chunks.length + ' · 点击取消');
+      el('bar').style.width = Math.round((i / chunks.length) * 100) + '%';
+      parts.push(await synthChunk(key, chunks[i], voice, style, model, ctrl.signal));
     }
-    const blob = await res.blob();
-    if (lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
-    lastBlobUrl = URL.createObjectURL(blob);
+    el('bar').style.width = '100%';
 
-    document.getElementById('audio').src = lastBlobUrl;
-    const dl = document.getElementById('dl');
-    dl.href = lastBlobUrl;
-    dl.download = 'advanced-tts_' + voice + '_' + Date.now() + '.mp3';
-    document.getElementById('player').classList.add('show');
-    bar.style.width = '100%';
-    document.getElementById('audio').play().catch(()=>{}); // iOS 可能需手动点播放
+    const pcm = concatPcm(parts, 300);
+    const blob = pcmToWav(pcm);
+    if (lastUrl) URL.revokeObjectURL(lastUrl);
+    lastUrl = URL.createObjectURL(blob);
+
+    el('audio').src = lastUrl;
+    const dl = el('dl');
+    dl.href = lastUrl;
+    dl.download = 'advanced-tts_' + s.id + '_' + Date.now() + '.wav';
+    el('playerTitle').textContent = isPreview ? '◈ 试听样音 · ' + s.name : '◈ 成品音频 · ' + s.name;
+    const secs = pcm.length / 2 / SAMPLE_RATE;
+    el('audioMeta').textContent =
+      '音色 ' + voice + ' · 时长 ' + secs.toFixed(1) + 's · ' + (blob.size / 1048576).toFixed(2) + ' MB · 24kHz 单声道';
+    el('player').classList.add('show');
+    el('audio').play().catch(() => {});   // iOS 可能需要手动点播放
   } catch (e) {
-    showErr('✕ 合成失败:' + e.message);
+    if (e.name !== 'AbortError') showErr('✕ 合成失败:' + e.message);
   } finally {
-    clearInterval(timer);
-    setTimeout(()=>{ bar.style.width='0%'; }, 600);
-    btn.disabled = false;
-    label.textContent = '⚡ 生成配音';
+    ctrl = null;
+    setBusy(false);
   }
 }
+
+function generate() {
+  if (ctrl) { ctrl.abort(); return; }     // 合成中再点一次 = 取消
+  run(ta.value, false);
+}
+function preview() {
+  if (ctrl) return;
+  run(scene().sample, true);
+}
+
+/* ── 初始化 ── */
+(function init() {
+  const p = loadPrefs();
+  if (SCENES.some(s => s.id === p.scene)) sceneId = p.scene;
+  if (Number.isInteger(p.pace) && PACE[p.pace]) el('pace').value = p.pace;
+  if (Number.isInteger(p.expr) && EXPR[p.expr]) el('expr').value = p.expr;
+  if (typeof p.smart === 'boolean') el('smart').checked = p.smart;
+  if (typeof p.useStyle === 'boolean') el('useStyle').checked = p.useStyle;
+  if (p.model) el('model').value = p.model;
+  if (!el('model').value) el('model').selectedIndex = 0;
+  if (p.custom) el('customVoice').value = p.custom;
+
+  const k = store.get(LS.key);
+  if (k) { el('apiKey').value = k; el('keyCard').style.opacity = .6; }
+
+  ['pace', 'expr'].forEach(id => el(id).addEventListener('input', () => { syncLabels(); savePrefs(); }));
+  ['smart', 'useStyle', 'altVoice', 'model'].forEach(id => el(id).addEventListener('change', () => { savePrefs(); updateSegs(); }));
+  el('customVoice').addEventListener('change', savePrefs);
+
+  syncLabels();
+  renderVoices();
+})();
 </script>
 </body>
 </html>
